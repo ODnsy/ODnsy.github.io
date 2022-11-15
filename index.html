@@ -3,55 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-
     <title>PyScript Hello World</title>
-
     <link rel="icon" type="image/png" href="favicon.png" />
     <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
-
     <script defer src="https://pyscript.net/latest/pyscript.js"></script>
   </head>
-
   <body>
     Hello world! <br>
     <div id="quad"></div>
     <label>請輸入句子：</label><input size="50" type="text" name="original_text"><br />
-    <button type="button" id="button">run Python</button>
-    <py-script>
-from js import document 
-from pyodide import create_proxy     
-import re
-dict_vision=["咖啡","金黃","蔚藍","翠綠","鮮紅","湛藍","烏溜溜","黃澄澄","綠油油","白皚皚","黑漆漆","毛絨絨","水汪汪","白皙的","閃閃發亮","紅黃","紅色","嶄新的","紫色"]
-dict_listen=["叮叮咚咚","嘩啦嘩啦","淅瀝淅瀝","滴滴答答","轟隆轟隆","吱吱喳喳","叩叩叩","撲簌撲簌","呼嚕呼嚕"]
-dict_object=["細細","長長","尖尖","長長","扁扁","方方","正正","寬寬","厚厚","小小","圓圓","大大"]
-dict_smell=["酸甜","苦澀","酸中帶甜","白Q細滑","油而不膩","香醇鮮美","香味四溢","香味"]
-dict_touch=["粗粗的","光滑柔順","質地輕柔","濕濕黏黏","柔軟"]
-text_1="我有一個四四方方咖啡色的背包，前面有粉紅的卡通圖案，旁邊掛著可愛的鈴鐺，每當我拿起背包時，便會叮叮咚咚作響。這個背包質地輕柔，摸起來柔軟舒適，是我最喜歡的背包。"
-def cut_sentence(sentence):
-  s = re.split('。|，|；', sentence)
-  s.pop() #去掉最後一個空值
-  return(s)
-sentence_test_1=cut_sentence(text_1)
-
-def get_dict(sentence,dict,dict_add):
-  for i in range (len(sentence)):
-    for j in range (len(dict)):
-      if(sentence[i].find(dict[j])>-1):
-        sentence[i]+=dict_add
-        break
-  return(sentence)
-
-def show_dict(sentence_dict):
-  sentence_dict=get_dict(sentence_dict,dict_vision,"(視覺)")
-  sentence_dict=get_dict(sentence_dict,dict_listen,"(聽覺)")
-  sentence_dict=get_dict(sentence_dict,dict_object,"(形狀大小)")
-  sentence_dict=get_dict(sentence_dict,dict_smell,"(味覺和嗅覺)")
-  sentence_dict=get_dict(sentence_dict,dict_touch,"(觸覺)")
-  return(sentence_dict)
-
-function_proxy = create_proxy(show_dict)
-document.getElementById("button").addEventListener("click", function_proxy)
-      
-    </py-script>
+    <button id="click-btn" class="bg-blue-500 text-white" pys-onClick="handle_click">Click</button>
+    <div id="output"></div>
+    <py-script src="./r.py"></py-script>
   </body>
 </html>
