@@ -42,11 +42,12 @@ def show_dict(sentence_dict):
   sentence_dict=get_dict(sentence_dict,dict_object,"(形狀大小)")
   sentence_dict=get_dict(sentence_dict,dict_smell,"(味覺和嗅覺)")
   sentence_dict=get_dict(sentence_dict,dict_touch,"(觸覺)")
+  print(sentence_dict)
   return(sentence_dict)
 
-print(show_dict(sentence_test_1))
-print(show_dict(sentence_test_2))
-print(show_dict(sentence_test_3))
-print(show_dict(sentence_test_4))
-print(show_dict(sentence_test_5))
+#print(show_dict(sentence_test_1))
+#print(show_dict(sentence_test_2))
+#print(show_dict(sentence_test_3))
+#print(show_dict(sentence_test_4))
+#print(show_dict(sentence_test_5))
 
