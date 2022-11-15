@@ -1,13 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>你好，GitHub</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+    <title>PyScript Hello World</title>
+
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
   </head>
+
   <body>
-  <h1>Sherry覺得厲害</h1>
-  <form >
-  <label>請輸入句子：</label><input size="50" type="text" name="original_text"><br />
-  <input type="submit" value="送出" />
-  </form>
+    Hello world! <br>
+    This is the current date and time, as computed by Python:
+    <py-script>
+from datetime import datetime
+now = datetime.now()
+now.strftime("%m/%d/%Y, %H:%M:%S")
+    </py-script>
+  </body>
 </html>
