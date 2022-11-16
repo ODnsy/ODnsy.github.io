@@ -20,6 +20,7 @@
       dict_touch=["粗粗的","光滑柔順","質地輕柔","濕濕黏黏","柔軟"]
       
       def cut_sentence(sentence):
+        sentence = re.sub("\n","",sentence)
         s = re.split('。|，|；', sentence)
         if(len(s)>1):
           s.pop() #去掉最後一個空值
