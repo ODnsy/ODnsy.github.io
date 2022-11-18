@@ -6,37 +6,51 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>NLP Research</title>
     <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <py-env>
+      - numpy
+      - pandas
+      - jinja2
+      - matplotlib
+      - seaborn
+    </py-env>
   </head>
   <body>
-
     <h4>請輸入句子或讀取檔案後，按執行：</h4>
     <button class="button" type="button" id="file_select">讀取檔案</button>
     <br>
-    <br>
-    <button id="submit-button" type="submit" pys-onClick="my_function">執行</button>
-    <br>
-    <br>
     <p>輸入句子:</p>
     <div id="filename"></div>
-    <div id="filesize"></div>
-    <div id="filetype"></div>
-    <div id="filedate"></div>
     <br>
     <textarea rows="10" cols="100" id="content"></textarea>
     <br>
-    <br>
+    <button id="submit-button" type="submit" pys-onClick="my_function">執行</button>  
     <p>結果:</p>
     <div id="test-output"></div>
-    <py-script>
+    <div id="test-plt"></div>
+    <div id="chart1"></div>
+<py-script>
 import asyncio
-import sys
+import re
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
 from js import alert, document, Object, window, console
 from pyodide import create_proxy, to_js
-import re
+from pyodide.http import open_url
+
+file_list=['vis.csv','lis.csv','obj.csv','sme.csv','tou.csv']
+dict=[]
+debug_test=[]
+for file_name in file_list:
+  dict_list=[]
+  df = pd.read_csv(open_url(file_name),encoding='utf-8-sig')
+  result = []
+  for element in df.values.tolist():
+      result.extend(element)
+  dict.append(result) 
 
 def clear_data():
   document.getElementById("filename").innerHTML = ''
-  document.getElementById("filesize").innerHTML = ''
   document.getElementById("content").value = ''
 
 async def file_select(event):
@@ -54,9 +68,6 @@ async def file_select(event):
 	for fileHandle in fileHandles:
 		file = await fileHandle.getFile()
 		document.getElementById("filename").innerHTML = 'File Name: ' + file.name
-		document.getElementById("filesize").innerHTML = 'File Size: ' + str(file.size)
-		document.getElementById("filetype").innerHTML = 'File Type: ' + str(file.type)
-		document.getElementById("filedate").innerHTML = 'File date: ' + str(file.lastModifiedDate)
 		content = await file.text()
 		document.getElementById('content').value = content
 
@@ -68,43 +79,52 @@ def setup_button():
 
 setup_button()
 
-dict_vision=["咖啡","金黃","蔚藍","翠綠","鮮紅","湛藍","烏溜溜","黃澄澄","綠油油","白皚皚","黑漆漆","毛絨絨","水汪汪","白皙的","閃閃發亮","紅黃","紅色","嶄新的","白色","紅色","黃色","綠色","藍色","紫色"]
-dict_listen=["叮叮咚咚","嘩啦嘩啦","淅瀝淅瀝","滴滴答答","轟隆轟隆","吱吱喳喳","叩叩叩","撲簌撲簌","呼嚕呼嚕"]
-dict_object=["細細","長長","尖尖","長長","扁扁","方方","正正","寬寬","厚厚","小小","圓圓","大大"]
-dict_smell=["酸甜","苦澀","酸中帶甜","白Q細滑","油而不膩","香醇鮮美","香味四溢","香味"]
-dict_touch=["粗粗的","光滑柔順","質地輕柔","濕濕黏黏","柔軟"]
-
 def cut_sentence(sentence):
-  s = re.split('。|，|；', sentence)
+  string = re.sub(r'\n', '', sentence)
+  s = re.split('。|，|；|！', string)
   if s[len(s)-1] == "":
-    s.pop() #去掉最後一個空值
+    s.pop() #去掉空值
   return(s)
 
-def get_dict(sentence,dict,dict_add):
+def get_dict(sentence,dict_content,dict_add):
+  count_dict=0
   for i in range (len(sentence)):
-    for j in range (len(dict)):
-      if(sentence[i].find(dict[j])>-1):
+    for j in range (len(dict_content)):
+      if(sentence[i].find(dict_content[j])>-1):   
         sentence[i]+=dict_add
+        count_dict+=1
         break
-  return(sentence)
+  return(sentence,count_dict)
 
 def show_dict(sentence_dict):
-  sentence_dict=get_dict(sentence_dict,dict_vision,"(視覺)")
-  sentence_dict=get_dict(sentence_dict,dict_listen,"(聽覺)")
-  sentence_dict=get_dict(sentence_dict,dict_object,"(形狀大小)")
-  sentence_dict=get_dict(sentence_dict,dict_smell,"(味覺和嗅覺)")
-  sentence_dict=get_dict(sentence_dict,dict_touch,"(觸覺)")
-  return(sentence_dict)
-
+  dict_c=["(視覺)","(聽覺)","(形狀大小)","(味覺和嗅覺)","(觸覺)"]
+  dict_plt=[]
+  for d in dict_c:
+    check_dict=get_dict(sentence_dict,dict[dict_c.index(d)],d)
+    dict_plt.append(check_dict[1])
+  return(check_dict[0],dict_plt)
 
 def my_function(*args, **kwargs):   
-    console.log(f'args: {args}')
-    console.log(f'kwargs: {kwargs}')
-    text = Element('content').element.value
-    #print('text:', text)
-    console.log(f'text: {text}')
-    Element('test-output').element.innerText = show_dict(cut_sentence(text))
+  console.log(f'args: {args}')
+  console.log(f'kwargs: {kwargs}')
+  text = Element('content').element.value
+  #print('text:', text)
+  console.log(f'text: {text}')
 
-    </py-script>
+  result=show_dict(cut_sentence(text))
+  Element('test-output').element.innerText =result[0]
+  chart = pd.DataFrame({"num": result[1],
+                    "feel": ["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]})
+  Element('test-plt').element.innerText =chart
+  plot(chart)
+
+def plot(chart):
+  x = x = np.arange(-10, 10, 0.1)
+  y = x*x
+  fig, ax = plt.subplots()
+  fig.plot(x, y)
+  pyscript.write("chart1",fig)
+
+  </py-script>
   </body>
 </html>
