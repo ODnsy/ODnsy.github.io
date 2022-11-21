@@ -11,7 +11,6 @@
       - pandas
       - jinja2
       - matplotlib
-      - seaborn
     </py-env>
   </head>
   <body>
@@ -26,14 +25,12 @@
     <button id="submit-button" type="submit" pys-onClick="my_function">執行</button>  
     <p>結果:</p>
     <div id="test-output"></div>
-    <div id="test-plt"></div>
     <div id="chart1"></div>
 <py-script>
 import asyncio
 import re
 import pandas as pd
 import matplotlib.pyplot as plt
-import seaborn as sns
 from js import alert, document, Object, window, console
 from pyodide import create_proxy, to_js
 from pyodide.http import open_url
@@ -113,17 +110,18 @@ def my_function(*args, **kwargs):
 
   result=show_dict(cut_sentence(text))
   Element('test-output').element.innerText =result[0]
-  chart = pd.DataFrame({"num": result[1],
-                    "feel": ["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]})
-  Element('test-plt').element.innerText =chart
-  plot(chart)
+  
+  plot(result[1])
 
 def plot(chart):
-  x = x = np.arange(-10, 10, 0.1)
-  y = x*x
   fig, ax = plt.subplots()
-  fig.plot(x, y)
-  pyscript.write("chart1",fig)
+  x = ["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]
+  y = chart
+  plt.bar(x, y)
+  plt.xlabel('Language')
+  plt.ylabel('Score')
+  plt.title('Language vs Score')
+  pyscript.write("chart1", fig)
 
   </py-script>
   </body>
