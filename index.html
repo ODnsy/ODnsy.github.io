@@ -6,8 +6,20 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>NLP Research</title>
     <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+    <style>
+      .button {
+        background-color: #008CBA; /* Green */
+        border: 2px solid #555555;
+        border-radius: 8px;
+        color: white;
+        padding: 5px 22px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+      }
+    </style>
     <py-env>
-      - numpy
       - pandas
       - jinja2
       - matplotlib
@@ -22,10 +34,11 @@
     <br>
     <textarea rows="10" cols="100" id="content"></textarea>
     <br>
-    <button id="submit-button" type="submit" pys-onClick="my_function">執行</button>  
+    <button class="button" id="submit-button" type="submit" pys-onClick="my_function">執行</button>  
     <p>結果:</p>
     <div id="test-output"></div>
-    <div id="chart1"></div>
+    <div id="table1" style="width:800px; margin:0 auto;"></div>
+    <div id="table2"></div>
 <py-script>
 import asyncio
 import re
@@ -45,6 +58,9 @@ for file_name in file_list:
   for element in df.values.tolist():
       result.extend(element)
   dict.append(result) 
+
+dict_chinese=["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]
+dict_english=["Vision","Listen","Object","Smell","Touch"]
 
 def clear_data():
   document.getElementById("filename").innerHTML = ''
@@ -102,6 +118,7 @@ def show_dict(sentence_dict):
   return(check_dict[0],dict_plt)
 
 def my_function(*args, **kwargs):   
+  clear_result()
   console.log(f'args: {args}')
   console.log(f'kwargs: {kwargs}')
   text = Element('content').element.value
@@ -111,18 +128,28 @@ def my_function(*args, **kwargs):
   result=show_dict(cut_sentence(text))
   Element('test-output').element.innerText =result[0]
   
-  plot(result[1])
+  print_table_plot(result[1])
 
-def plot(chart):
-  fig, ax = plt.subplots()
-  x = ["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]
-  y = chart
-  plt.bar(x, y)
-  plt.xlabel('Language')
-  plt.ylabel('Score')
-  plt.title('Language vs Score')
-  pyscript.write("chart1", fig)
+def clear_result():
+  document.getElementById("test-output").innerHTML = ''
+  document.getElementById("table1").innerHTML = ''
+  document.getElementById("table2").innerHTML = ''
 
+def print_table_plot(num):
+  df = pd.DataFrame([dict_english,num],columns=dict_chinese,index=["英文名稱","數量"])
+  pyscript.write("table1", df)
+
+  fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10, 4))
+  color = ['red','orange','yellow','green','purple']   # 顏色數據
+  ax1.bar(dict_english, num,color=color)
+  ax2.pie(num,                           # 數值
+          labels = dict_english,                # 標籤
+          colors=color,
+          autopct = "%1.1f%%",            # 將數值百分比並留到小數點一位
+          pctdistance = 0.8,              # 數字距圓心的距離
+          textprops = {"fontsize" : 11},  # 文字大小
+          shadow=True)                    # 設定陰影
+  pyscript.write("table2", fig)
   </py-script>
   </body>
 </html>
