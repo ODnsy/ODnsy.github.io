@@ -1,0 +1,83 @@
+<html>
+  
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Test</title>
+  <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
+  <py-env>
+    - matplotlib
+    - pandas
+  </py-env>
+</head>
+  
+<body>
+  <button class="button" type="button" id="file_save">Write Local File</button>
+  <div id="table1" style="width:800px; margin:0 auto;"></div>
+  <div id="table2"></div>
+import pandas as pd
+import matplotlib.pyplot as plt 
+import asyncio
+import sys
+from pyodide import create_proxy, to_js
+
+dict_english=['Vision','Listen','Object','Smell','Touch']
+dict_chinese=["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]
+num=[13,2,3,1,4]
+color = ['red','orange','yellow','green','purple']   # 顏色數據
+content="我有一個四四方方咖啡色的背包，前面有粉紅的卡通圖案，旁邊掛著可愛的鈴鐺，每當我拿起背包時，便會叮叮咚咚作響。這個背包質地輕柔，摸起來柔軟舒適，是我最喜歡的背包。的聲響。這個書包的質地輕柔，摸起來光滑柔順，是我上學的好夥伴，它是我最喜歡的書包。"
+
+
+df = pd.DataFrame([dict_english,num],columns=dict_chinese,index=["英文名稱","數量"])
+pyscript.write("table1", df)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize = (10, 4))
+color = ['red','orange','yellow','green','purple']   # 顏色數據
+ax1.bar(dict_english, num,color=color)
+ax2.pie(num,                           # 數值
+        labels = dict_english,                # 標籤
+        colors=color,
+        autopct = "%1.1f%%",            # 將數值百分比並留到小數點一位
+        pctdistance = 0.8,              # 數字距圓心的距離
+        textprops = {"fontsize" : 10},  # 文字大小
+        shadow=True)                    # 設定陰影
+pyscript.write("table2", fig)
+
+
+async def file_save(event):
+  # Note: print() does not work in event handlers
+
+  try:
+    options = {
+      "startIn": "documents",
+      "suggestedName": "testfile.txt"
+    }
+
+    fileHandle = await window.showSaveFilePicker(Object.fromEntries(to_js(options)))
+  except Exception as e:
+    console.log('Exception: ' + str(e))
+    return
+
+  #content = document.getElementById("content").value
+  #content = document.getElementById("table2").innerHTML 
+
+  file = await fileHandle.createWritable()
+  await file.write(content)
+  await file.close()
+  return
+
+def export_button():
+  # Create a Python proxy for the callback function
+  file_save_proxy = create_proxy(file_save)
+
+  # Set the listener to the callback
+  document.getElementById("file_save").addEventListener("click", file_save_proxy, False)
+
+export_button()
+
+
+</py-script>
+  
+  </body>
+</html>
