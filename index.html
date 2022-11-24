@@ -23,6 +23,12 @@
       - pandas
       - jinja2
       - matplotlib
+      - paths:
+        - vis.csv
+        - lis.csv
+        - obj.csv
+        - sme.csv
+        - tou.csv
     </py-env>
   </head>
   <body>
@@ -46,17 +52,16 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from js import alert, document, Object, window, console
 from pyodide import create_proxy, to_js
-from pyodide.http import open_url
 
 file_list=['vis.csv','lis.csv','obj.csv','sme.csv','tou.csv']
 dict=[]
 debug_test=[]
 for file_name in file_list:
   dict_list=[]
-  df = pd.read_csv(open_url(file_name),encoding='utf-8-sig')
+  df = pd.read_csv(file_name,encoding='utf-8-sig')
   result = []
   for element in df.values.tolist():
-      result.extend(element)
+    result.extend(element)
   dict.append(result) 
 
 dict_chinese=["視覺","聽覺","形狀大小","味覺和嗅覺","觸覺"]
